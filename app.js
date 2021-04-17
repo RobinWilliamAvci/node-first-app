@@ -31,7 +31,7 @@ const server = http.createServer((req, res) => {
     // }
 
     // Buld file path
-    let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+    let filePath = path.join(__dirname, 'public', req.url === '/' ? '/index.html' : req.url);
 
     // Extension of file
     let extname = path.extname(filePath);
@@ -62,16 +62,21 @@ const server = http.createServer((req, res) => {
       fs.readFile(filePath, (err, content) => {
           if(err){
               if(err.code =='ENOENT'){
-                  // Page not found
-                  fs.readFile(path.join(__dirname, 'public', '404.html'), (err, content) => {
-                      if(err) {
+                fs.readFile(path.join(filePath,'/index.html'), (err, content) => {
+                  if(err){
+                      if(err.code =='ENOENT'){
+                        // Page not found
+                        fs.readFile(path.join(__dirname, 'public', '404.html'), (err, content) => {
+                            if(err) {
 
-                      }
+                            }
 
                       res.writeHead(200, {'Content-Type': 'text/html'});
                       res.end(content, 'utf8');
-                  })
-
+                        })
+                    }
+                  }
+                })
               } else{
                 // Some server error
                 res.writeHead(500);
